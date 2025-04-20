@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Comprehensive farming resource with cultivation guides, pest management, weather tracking, and agricultural news">
+    <title>Farmer's Knowledge Hub - Agricultural Resources & Farming Tips</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+    
+    <!-- CSS with fallback -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #8BC34A;
+            --text-color: #333;
+            --text-light: #5a5a5a;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+            --max-width: 1200px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-gray);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: min(90%, var(--max-width));
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+        }
+
+        header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .search-box {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-box input {
+            padding: 0.8rem 1rem;
+            width: 100%;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 1rem;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .search-box input:focus {
+            outline: 2px solid var(--primary-light);
+            outline-offset: -2px;
+        }
+
+        .search-box button {
+            padding: 0 1.5rem;
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-box button:hover {
+            background-color: #1B5E20;
+        }
+
+        /* Skip to Content Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary-dark);
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: var(--primary-dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 1rem 0;
+            gap: 0.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: var(--primary-light);
+            color: var(--text-color);
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem auto;
+            flex: 1;
+        }
+
+        .sidebar {
+            flex: 1;
+            position: sticky;
+            top: 80px;
+            align-self: flex-start;
+            height: fit-content;
+        }
+
+        main {
+            flex: 3;
+            min-width: 0; /* Fixes flexbox overflow issues */
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+        }
+
+        /* Tab System */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .tab-btn.active {
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1rem 0;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active-tab {
+            display: block;
+        }
+
+        /* Grid Layout for Tips */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .tip-card {
+            background: var(--light-gray);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tip-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-light);
+        }
+
+        /* Accordion Styles */
+        .accordion-item {
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .accordion-btn {
+            width: 100%;
+            text-align: left;
+            padding: 1.25rem;
+            background: var(--light-gray);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: var(--transition);
+            gap: 1rem;
+        }
+
+        .accordion-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .accordion-btn:focus {
+            outline: 2px solid var(--primary-light);
+            outline-offset: -2px;
+        }
+
+        .accordion-btn .icon {
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .accordion-btn[aria-expanded="true"] .icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            padding: 0 1.25rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: var(--white);
+        }
+
+        .accordion-content.show {
+            padding: 1.25rem;
+            max-height: 1000px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, var(--primary-dark), #1B5E20);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-grid h4 {
+            margin-bottom: 1.25rem;
+            font-size: 1.2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-grid h4::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary-light);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-light);
+            color: var(--text-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+            font-weight: 500;
+            gap: 0.5rem;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #7CB342;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-light);
+            color: var(--primary-light);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+            color: var(--text-color);
+        }
+
+        /* Loading Animation */
+        .loader {
+            display: none;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast .close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: static;
+                margin-bottom: 2rem;
+            }
+
+            nav ul {
+                justify-content: flex-start;
+                padding: 0.75rem 0;
+            }
+
+            .search-box {
+                width: 90%;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                justify-content: flex-start;
+                padding: 0.75rem 1rem;
+            }
+
+            .tab-btn.active {
+                border-left: 3px solid var(--primary-color);
+                border-bottom: none;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            nav, .sidebar, .search-box, .btn {
+                display: none;
+            }
+
+            .main-content {
+                display: block;
+            }
+
+            .card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            .tab-content {
+                display: block !important;
+                animation: none;
+            }
+
+            footer {
+                background: none;
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-tractor" aria-hidden="true"></i> Farmer's Knowledge Hub</h1>
+            <p>Practical farming advice at your fingertips</p>
+            <!-- <div class="search-box" role="search">
+                <input type="search" placeholder="Search for farming tips..." aria-label="Search farming resources" id="search-input">
+                <button aria-label="Search" id="search-btn"><i class="fas fa-search"></i></button>
+            </div> -->
+        </div>
+    </header>
+
+    <nav aria-label="Main navigation">
+        <div class="container">
+            <ul>
+                <li><a href="index.html"><i class="fas fa-shopping-cart" aria-hidden="true"></i> <span>Home</span></a></li>
+                <li><a href="tutorial.html"><i class="fas fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="weather.html"><i class="fas fa-cloud-sun"></i> Weather</a></li>
+                <li><a href="marketplace.html"><i class="fas fa-shopping-basket"></i> Marketplace</a></li>
+                <li><a href="community.html"><i class="fas fa-users"></i> Community</a></li>
+                <li><a href="about.html"><i class="fas fa-user-tie"></i>About</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        <aside class="sidebar">
+            <div class="card">
+                <h3>Quick Links</h3>
+                <ul class="quick-links">
+                    <li><a href="calender.html"><i class="fas fa-calendar-alt" aria-hidden="true"></i> <span>Planting Calendar</span></a></li>
+                    <li><a href=""><i class="fas fa-bug" aria-hidden="true"></i> <span>Pest Control</span></a></li>
+                    <li><a href="#irrigation"><i class="fas fa-tint" aria-hidden="true"></i> <span>Irrigation Methods</span></a></li>
+                    <li><a href="#organic"><i class="fas fa-recycle" aria-hidden="true"></i> <span>Organic Farming</span></a></li>
+                    <li><a href="#govt-schemes"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> <span>Govt. Schemes</span></a></li>
+                </ul>
+            </div>
+
+            <div class="card weather-widget">
+                <h3>Weather Forecast</h3>
+                <div class="weather-info">
+                    <i class="fas fa-sun fa-2x" aria-hidden="true"></i>
+                    <div>
+                        <p><strong>Today</strong>: 28°C, Mostly Sunny</p>
+                        <p>Rain: 10% • Humidity: 65%</p>
+                    </div>
+                </div>
+                <div class="weather-details" id="weather-details"></div>
+                <a href="weather.html"><button class="btn" id="weather-btn"><i class="fas fa-cloud-sun"></i> View Full Forecast</button></a>
+                <div class="loader" id="weather-loader"></div>
+            </div>
+
+            <div class="card emergency-contacts">
+                <h3>Emergency Contacts</h3>
+                <ul>
+                    <li><a href="tel:1800123456"><i class="fas fa-phone-alt"></i> Farmer Helpline: 1800-123-456</a></li>
+                    <li><a href="tel:100"><i class="fas fa-ambulance"></i> Emergency: 100</a></li>
+                    <li><a href="tel:18001801551"><i class="fas fa-leaf"></i> Organic Certification: 1800-180-1551</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main id="main-content">
+            <section id="crops" class="card active-section">
+                <h2><i class="fas fa-seedling" aria-hidden="true"></i> Crop Cultivation Guide</h2>
+                <div class="tabs" role="tablist">
+                    <button class="tab-btn active" onclick="openTab(event, 'annual-crops')" role="tab" aria-selected="true" aria-controls="annual-crops">Annual Crops</button>
+                    <button class="tab-btn" onclick="openTab(event, 'perennial-crops')" role="tab" aria-selected="false" aria-controls="perennial-crops">Perennial Crops</button>
+                    <button class="tab-btn" onclick="openTab(event, 'vegetables')" role="tab" aria-selected="false" aria-controls="vegetables">Vegetables</button>
+                    <button class="tab-btn" onclick="openTab(event, 'cash-crops')" role="tab" aria-selected="false" aria-controls="cash-crops">Cash Crops</button>
+                </div>
+
+                <div id="annual-crops" class="tab-content active-tab" role="tabpanel">
+                    <h3>Staple Crops (Rice, Wheat, Corn)</h3>
+                    <div class="grid-container">
+                        <div class="tip-card">
+                            <h4>Planting Time</h4>
+                            <p><strong>Rice:</strong> June-July (Kharif season)</p>
+                            <p><strong>Wheat:</strong> November-December (Rabi season)</p>
+                            <p><strong>Corn:</strong> May-June or September-October</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Optimal Conditions</h4>
+                            <p><strong>Soil pH:</strong> 5.5-7.0</p>
+                            <p><strong>Water:</strong> 1000-1500mm rainfall</p>
+                            <p><strong>Temperature:</strong> 20-30°C</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Fertilization</h4>
+                            <p><strong>NPK ratio:</strong> 4:2:1 for most cereals</p>
+                            <p><strong>Organic compost:</strong> 5-10 tons per hectare</p>
+                            <p><strong>Top dressing:</strong> Urea at tillering stage</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Common Pests</h4>
+                            <p><strong>Rice:</strong> Stem borers, leaf folders</p>
+                            <p><strong>Wheat:</strong> Aphids, rust</p>
+                            <p><strong>Corn:</strong> Armyworms, borers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="perennial-crops" class="tab-content" role="tabpanel">
+                    <h3>Fruit Trees & Plantations</h3>
+                    <div class="grid-container">
+                        <div class="tip-card">
+                            <h4>Common Fruit Trees</h4>
+                            <p><strong>Mango:</strong> Plant in rainy season</p>
+                            <p><strong>Citrus:</strong> Requires well-drained soil</p>
+                            <p><strong>Apple:</strong> Needs winter chilling</p>
+                            <p><strong>Banana:</strong> Plant suckers in pits</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Maintenance</h4>
+                            <p><strong>Pruning:</strong> Annual during dormancy</p>
+                            <p><strong>Irrigation:</strong> Drip recommended</p>
+                            <p><strong>Fertilization:</strong> Balanced NPK + micronutrients</p>
+                            <p><strong>Mulching:</strong> Conserves moisture</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Harvesting</h4>
+                            <p><strong>Maturity signs:</strong> Color change, easy separation</p>
+                            <p><strong>Time:</strong> Cool morning hours</p>
+                            <p><strong>Tools:</strong> Secateurs, picking poles</p>
+                            <p><strong>Post-harvest:</strong> Quick cooling preserves quality</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="vegetables" class="tab-content" role="tabpanel">
+                    <h3>Vegetable Cultivation</h3>
+                    <div class="grid-container">
+                        <div class="tip-card">
+                            <h4>Seasonal Vegetables</h4>
+                            <p><strong>Tomatoes:</strong> 6-8 hours sunlight</p>
+                            <p><strong>Leafy greens:</strong> Partial shade preferred</p>
+                            <p><strong>Root crops:</strong> Loose, well-drained soil</p>
+                            <p><strong>Cucurbits:</strong> Warm soil for germination</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Planting Guide</h4>
+                            <p><strong>Spacing:</strong> Avoid overcrowding</p>
+                            <p><strong>Succession planting:</strong> Stagger plantings</p>
+                            <p><strong>Companion plants:</strong> Marigolds deter pests</p>
+                            <p><strong>Rotation:</strong> Prevent disease buildup</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Harvesting</h4>
+                            <p><strong>Morning harvest:</strong> Retains moisture</p>
+                            <p><strong>Tools:</strong> Sharp knives/shears</p>
+                            <p><strong>Frequency:</strong> Regular picking promotes yield</p>
+                            <p><strong>Storage:</strong> Cool, humid conditions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="cash-crops" class="tab-content" role="tabpanel">
+                    <h3>Cash Crops (Cotton, Sugarcane, Tea)</h3>
+                    <div class="grid-container">
+                        <div class="tip-card">
+                            <h4>Planting Requirements</h4>
+                            <p><strong>Cotton:</strong> Warm climate, well-drained soil</p>
+                            <p><strong>Sugarcane:</strong> Tropical/subtropical regions</p>
+                            <p><strong>Tea:</strong> Acidic soil, high rainfall</p>
+                            <p><strong>Coffee:</strong> Shade-grown at elevations</p>
+                        </div>
+                        <div class="tip-card">
+                            <h4>Market Considerations</h4>
+                            <p><strong>Quality standards:</strong> Meet buyer requirements</p>
+                            <p><strong>Contract farming:</strong> Secure prices in advance</p>
+                            <p><strong>Processing:</strong> Adds value to raw products</p>
+                            <p><strong>Export potential:</strong> Certification needed</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pest-control" class="card">
+                <h2><i class="fas fa-bug" aria-hidden="true"></i> Pest & Disease Management</h2>
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-btn" aria-expanded="false" aria-controls="pest-content">
+                            <span>Common Crop Pests</span>
+                            <i class="fas fa-chevron-down icon" aria-hidden="true"></i>
+                        </button>
+                        <div id="pest-content" class="accordion-content">
+                            <div class="grid-container">
+                                <div class="tip-card">
+                                    <h4>Sucking Pests</h4>
+                                    <p><strong>Aphids:</strong> Use neem oil spray (2%) weekly</p>
+                                    <p><strong>Whiteflies:</strong> Yellow sticky traps + neem extract</p>
+                                    <p><strong>Thrips:</strong> Blue sticky traps, spinosad</p>
+                                </div>
+                                <div class="tip-card">
+                                    <h4>Chewing Pests</h4>
+                                    <p><strong>Bollworms:</strong> Release Trichogramma wasps</p>
+                                    <p><strong>Locusts:</strong> Early morning spraying with malathion</p>
+                                    <p><strong>Caterpillars:</strong> Bt (Bacillus thuringiensis)</p>
+                                </div>
+                                <div class="tip-card">
+                                    <h4>Soil Pests</h4>
+                                    <p><strong>Cutworms:</strong> Collars around seedlings</p>
+                                    <p><strong>Nematodes:</strong> Marigold intercropping</p>
+                                    <p><strong>Grubs:</strong> Neem cake application</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-btn" aria-expanded="false" aria-controls="disease-content">
+                            <span>Crop Diseases</span>
+                            <i class="fas fa-chevron-down icon" aria-hidden="true"></i>
+                        </button>
+                        <div id="disease-content" class="accordion-content">
+                            <div class="grid-container">
+                                <div class="tip-card">
+                                    <h4>Fungal Diseases</h4>
+                                    <p><strong>Powdery mildew:</strong> Baking soda spray</p>
+                                    <p><strong>Rust:</strong> Remove infected leaves</p>
+                                    <p><strong>Blight:</strong> Copper-based fungicides</p>
+                                </div>
+                                <div class="tip-card">
+                                    <h4>Bacterial Diseases</h4>
+                                    <p><strong>Blight:</strong> Copper sprays, resistant varieties</p>
+                                    <p><strong>Wilt:</strong> Soil solarization</p>
+                                    <p><strong>Canker:</strong> Prune infected branches</p>
+                                </div>
+                                <div class="tip-card">
+                                    <h4>Viral Diseases</h4>
+                                    <p><strong>Mosaic viruses:</strong> Control aphid vectors</p>
+                                    <p><strong>Leaf curl:</strong> Remove infected plants</p>
+                                    <p><strong>Yellowing:</strong> Use certified disease-free seeds</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <button class="accordion-btn" aria-expanded="false" aria-controls="organic-content">
+                            <span>Organic Solutions</span>
+                            <i class="fas fa-chevron-down icon" aria-hidden="true"></i>
+                        </button>
+                        <div id="organic-content" class="accordion-content">
+                            <h4>Natural Pesticide Recipes</h4>
+                            <div class="grid-container">
+                                <div class="tip-card">
+                                    <h4>Garlic-Chili Spray</h4>
+                                    <p>Mix 100g garlic + 50g chili in 1L water, strain after 24 hours</p>
+                                    <p><strong>Use:</strong> Broad-spectrum repellent</p>
+                                </div>
+                                <div class="tip-card">
+                                    <h4>Neem Oil Spray</h4>
+                                    <p>5ml neem oil + 2ml liquid soap in 1L water</p>
+                                    <p><strong>Use:</strong> Disrupts insect life cycle</p>
+                                </div>
+                                <div class="tip-card">
+                                    <h4>Fermented Compost Tea</h4>
+                                    <p>Aerate compost in water for 48 hours, strain and spray</p>
+                                    <p><strong>Use:</strong> Boosts plant immunity</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="soil-health" class="card">
+                <h2><i class="fas fa-mountain" aria-hidden="true"></i> Soil Health Management</h2>
+                <div class="grid-container">
+                    <div class="tip-card">
+                        <h4>Soil Testing</h4>
+                        <p><strong>When:</strong> Before each cropping season</p>
+                        <p><strong>Parameters:</strong> pH, N-P-K, organic matter</p>
+                        <p><strong>Sampling:</strong> Take from multiple spots</p>
+                        <button class="btn btn-outline">Find Testing Labs</button>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Improving Soil Fertility</h4>
+                        <p><strong>Organic matter:</strong> Compost, manure</p>
+                        <p><strong>Green manure:</strong> Grow and plow under legumes</p>
+                        <p><strong>Biofertilizers:</strong> Rhizobium, Azotobacter</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>Soil Conservation</h4>
+                        <p><strong>Contour farming:</strong> On slopes</p>
+                        <p><strong>Mulching:</strong> Reduces erosion</p>
+                        <p><strong>Cover crops:</strong> Protect bare soil</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="news" class="card">
+                <h2><i class="fas fa-newspaper" aria-hidden="true"></i> Agricultural News & Updates</h2>
+                <div id="news-container">
+                    <div class="loader" id="news-loader"></div>
+                    <!-- News items will be loaded here -->
+                </div>
+                <button class="btn" id="load-news"><i class="fas fa-sync-alt"></i> Load More News</button>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4>Contact Support</h4>
+                    <p><i class="fas fa-phone" aria-hidden="true"></i> Farmer Helpline: 1800-123-456</p>
+                    <p><i class="fas fa-envelope" aria-hidden="true"></i> Email: support@farmershub.org</p>
+                    <p><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Regional Offices: 8 locations nationwide</p>
+                </div>
+                <div>
+                    <h4>Quick Resources</h4>
+                    <button class="btn"><i class="fas fa-file-pdf" aria-hidden="true"></i> Farming Calendar</button>
+                    <button class="btn"><i class="fas fa-book" aria-hidden="true"></i> Pest Guide</button>
+                    <button class="btn"><i class="fas fa-calculator" aria-hidden="true"></i> Profit Calculator</button>
+                </div>
+                <div>
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <button class="btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+                        <button class="btn" aria-label="Twitter"><i class="fab fa-twitter"></i> Twitter</button>
+                        <button class="btn" aria-label="YouTube"><i class="fab fa-youtube"></i> YouTube</button>
+                    </div>
+                </div>
+                <div>
+                    <h4>Subscribe to Newsletter</h4>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Your email address" aria-label="Email for newsletter">
+                        <button class="btn" style="width: 100%; margin-top: 0.5rem;">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2023 Farmer's Knowledge Hub | Made for farmers, by farmers</p>
+                <div class="footer-links">
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#terms">Terms of Service</a>
+                    <a href="#accessibility">Accessibility</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <span id="toast-message">Welcome to Farmer's Knowledge Hub!</span>
+        <button class="close" aria-label="Close notification">&times;</button>
+    </div>
+
+    <script>
+        // Enhanced Tab functionality with history support
+        function openTab(event, tabId) {
+            // Prevent default if coming from click event
+            if (event) event.preventDefault();
+            
+            // Get all elements with class="tab-content" and hide them
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active-tab');
+                tab.setAttribute('aria-hidden', 'true');
+            });
+            
+            // Get all elements with class="tab-btn" and remove the "active" class
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            const tabElement = document.getElementById(tabId);
+            if (tabElement) {
+                tabElement.classList.add('active-tab');
+                tabElement.setAttribute('aria-hidden', 'false');
+                
+                const button = event ? event.currentTarget : document.querySelector(`[aria-controls="${tabId}"]`);
+                if (button) {
+                    button.classList.add('active');
+                    button.setAttribute('aria-selected', 'true');
+                }
+                
+                // Update URL hash
+                if (event) {
+                    history.pushState(null, null, `#${tabId}`);
+                }
+                
+                // Focus the first focusable element in the tab for keyboard users
+                setTimeout(() => {
+                    const firstFocusable = tabElement.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (firstFocusable) firstFocusable.focus();
+                }, 50);
+            }
+        }
+
+        // Check URL hash on load and when history changes
+        function checkHash() {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                const tabButton = document.querySelector(`[aria-controls="${hash}"]`);
+                if (tabButton) {
+                    openTab(null, hash);
+                } else {
+                    // Scroll to section if it's not a tab
+                    const element = document.getElementById(hash);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', checkHash);
+        window.addEventListener('hashchange', checkHash);
+
+        // Enhanced Accordion functionality
+        document.querySelectorAll('.accordion-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const expanded = button.getAttribute('aria-expanded') === 'true';
+                const accordionContent = document.getElementById(button.getAttribute('aria-controls'));
+                
+                // Toggle state
+                button.setAttribute('aria-expanded', !expanded);
+                accordionContent.classList.toggle('show');
+                
+                // Smooth scroll to keep content in view
+                if (!expanded) {
+                    setTimeout(() => {
+                        button.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+            });
+        });
+
+        // Weather widget functionality with loading state
+        document.getElementById('weather-btn').addEventListener('click', async function() {
+            const btn = this;
+            const loader = document.getElementById('weather-loader');
+            const details = document.getElementById('weather-details');
+            
+            btn.disabled = true;
+            loader.style.display = 'block';
+            details.innerHTML = '';
+            
+            // Simulate API call
+            try {
+                await new Promise(resolve => setTimeout(resolve, 1200));
+                
+                // In a real app, this would be actual API data
+                details.innerHTML = `
+                    <div class="weather-forecast">
+                        <h4>7-Day Forecast</h4>
+                        <div class="forecast-grid">
+                            <div class="forecast-day">
+                                <p><strong>Tomorrow</strong></p>
+                                <i class="fas fa-cloud-sun"></i>
+                                <p>26°C / 18°C</p>
+                                <p>20% rain</p>
+                            </div>
+                            <div class="forecast-day">
+                                <p><strong>Day 3</strong></p>
+                                <i class="fas fa-sun"></i>
+                                <p>28°C / 19°C</p>
+                                <p>10% rain</p>
+                            </div>
+                            <div class="forecast-day">
+                                <p><strong>Day 4</strong></p>
+                                <i class="fas fa-cloud-showers-heavy"></i>
+                                <p>24°C / 17°C</p>
+                                <p>60% rain</p>
+                            </div>
+                        </div>
+                        <p class="weather-tip"><i class="fas fa-info-circle"></i> Best planting days: Tomorrow and Day 3</p>
+                    </div>
+                `;
+                details.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Forecast';
+                showToast('Weather forecast updated successfully');
+            } catch (error) {
+                details.innerHTML = '<p class="weather-error">Failed to load weather data. Please try again.</p>';
+                details.style.display = 'block';
+                showToast('Failed to load weather data', 'error');
+            } finally {
+                loader.style.display = 'none';
+                btn.disabled = false;
+            }
+        });
+
+        // News loading functionality
+        let currentNewsPage = 1;
+        document.getElementById('load-news').addEventListener('click', async function() {
+            const btn = this;
+            const loader = document.getElementById('news-loader');
+            const container = document.getElementById('news-container');
+            
+            btn.disabled = true;
+            loader.style.display = 'block';
+            
+            // Simulate API call
+            try {
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // In a real app, this would be actual API data
+                const newsItems = [
+                    {
+                        title: "New Drought-Resistant Wheat Variety Released",
+                        summary: "Scientists develop wheat that requires 30% less water while maintaining yield. Field trials show promising results in arid regions.",
+                        date: "June 15, 2023",
+                        category: "Research"
+                    },
+                    {
+                        title: "Government Announces New Farmer Subsidies",
+                        summary: "Increased support for organic farming practices in the new agricultural bill. Subsidies cover up to 50% of certification costs.",
+                        date: "June 10, 2023",
+                        category: "Policy"
+                    },
+                    {
+                        title: "Mobile App for Pest Identification Launched",
+                        summary: "New AI-powered app helps farmers identify pests and diseases using smartphone cameras. Available in 8 regional languages.",
+                        date: "June 5, 2023",
+                        category: "Technology"
+                    }
+                ];
+                
+                newsItems.forEach(item => {
+                    const article = document.createElement('article');
+                    article.className = 'tip-card news-item';
+                    article.innerHTML = `
+                        <div class="news-header">
+                            <span class="news-category">${item.category}</span>
+                            <span class="news-date">${item.date}</span>
+                        </div>
+                        <h4>${item.title}</h4>
+                        <p>${item.summary}</p>
+                        <button class="btn btn-outline" style="margin-top: 0.5rem;">Read More</button>
+                    `;
+                    container.insertBefore(article, loader);
+                });
+                
+                currentNewsPage++;
+                if (currentNewsPage > 2) {
+                    btn.style.display = 'none';
+                }
+                
+                showToast('Loaded latest farming news');
+            } catch (error) {
+                const errorMsg = document.createElement('p');
+                errorMsg.className = 'news-error';
+                errorMsg.textContent = 'Failed to load news. Please check your connection.';
+                container.appendChild(errorMsg);
+                showToast('Failed to load news', 'error');
+            } finally {
+                loader.style.display = 'none';
+                btn.disabled = false;
+            }
+        });
+
+        // Load initial news
+        document.getElementById('load-news').click();
+
+        // Search functionality
+        document.getElementById('search-btn').addEventListener('click', function() {
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                showToast(`Searching for: ${query}`);
+                // In a real app, this would trigger a search
+                console.log('Search query:', query);
+            }
+        });
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+        }
+
+        // Close toast button
+        document.querySelector('.toast .close').addEventListener('click', function() {
+            document.getElementById('toast').classList.remove('show');
+        });
+
+        // Show welcome toast after page loads
+        setTimeout(() => {
+            showToast('Welcome to Farmer\'s Knowledge Hub! Tap the weather button to get local forecasts.');
+        }, 1000);
+
+        // Print button functionality
+        const printBtn = document.createElement('button');
+        printBtn.className = 'btn';
+        printBtn.innerHTML = '<i class="fas fa-print"></i> Print Resources';
+        printBtn.style.margin = '1rem 0';
+        printBtn.onclick = () => window.print();
+        document.querySelector('main').appendChild(printBtn);
+    </script>
+</body>
+</html>

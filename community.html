@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmFresh Community Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai/dist/browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #8BC34A;
+            --light: #F1F8E9;
+            --dark: #2E7D32;
+            --accent: #FFC107;
+            --blue: #2196F3;
+            --red: #F44336;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            background-color: var(--dark);
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        nav a:hover {
+            background-color: var(--primary);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: #333;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Community Portal Styles */
+        .community-portal {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+        .sidebar h3 {
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar li {
+            margin-bottom: 0.5rem;
+        }
+        .sidebar a {
+            display: block;
+            padding: 0.5rem;
+            border-radius: 4px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .sidebar a:hover {
+            background-color: var(--light);
+        }
+        .sidebar a.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        /* Chat Section */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 1rem;
+            max-width: 70%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            position: relative;
+        }
+        .message.admin {
+            background-color: var(--light);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        .message.user {
+            background-color: var(--primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+        .message-time {
+            font-size: 0.7rem;
+            color: #777;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+        
+        /* Admin List */
+        .admin-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .admin-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .admin-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 3px solid var(--primary);
+        }
+        .admin-card h4 {
+            margin: 0.5rem 0;
+        }
+        .admin-card p {
+            color: #777;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+        .admin-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.3rem;
+        }
+        .status-online {
+            background-color: #4CAF50;
+        }
+        .status-offline {
+            background-color: #F44336;
+        }
+        .status-away {
+            background-color: #FFC107;
+        }
+        
+        /* Discussion Forum */
+        .discussion-list {
+            margin-top: 2rem;
+        }
+        .discussion-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+        }
+        .discussion-item:hover {
+            background-color: #f9f9f9;
+        }
+        .discussion-item h4 {
+            margin: 0 0 0.5rem 0;
+        }
+        .discussion-meta {
+            display: flex;
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .discussion-meta span {
+            margin-right: 1rem;
+        }
+        .discussion-excerpt {
+            color: #555;
+        }
+        .message.admin i {
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .community-portal {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Add this with your other meta tags -->
+
+    
+</head>
+<body>
+    <header>
+        <h1 style="text-shadow: 2px 2px 4px black">FarmFresh Community</h1>
+        <p style="text-shadow: 3px 3px 5px black">Connect, Learn, and Grow Together</p>
+    </header>
+    
+    <nav>
+        <div class="logo">
+            <a href="#"><i class="fas fa-tractor"></i> FarmFresh</a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-users"></i> Home Page </a>
+            <a href="tutorial.html"><i class="fas fa-graduation-cap"></i> Tutorials</a>
+            <a href="weather.html"><i class="fas fa-cloud-sun"></i> Weather</a>
+            <a href="marketplace.html"><i class="fas fa-shopping-basket"></i> Marketplace</a>
+            <a href="about.html"><i class="fas fa-user-tie"></i>About</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="community-portal">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3>Community Menu</h3>
+                <ul>
+                    <li><a href="#" class="active"><i class="fas fa-comments"></i> Chat with Admin</a></li>
+                    <li><a href="calender.html"><i class="fas fa-calendar-alt"></i> Events Calendar</a></li>
+                    <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                    <li><a href="#"><i class="fas fa-book"></i> Community Guidelines</a></li>
+                </ul>
+                
+                <h3>Online Admins</h3>
+                <div class="admin-list">
+                    <div class="admin-card" onclick="startChat('admin1')">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Admin">
+                        <h4>Sarah Johnson</h4>
+                        <p>Agronomy Expert</p>
+                        <div><span class="admin-status status-online"></span> Online</div>
+                    </div>
+                    <div class="admin-card" onclick="startChat('admin2')">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Admin">
+                        <h4>Michael Chen</h4>
+                        <p>Organic Farming</p>
+                        <div><span class="admin-status status-online"></span> Online</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <h2><i class="fas fa-comments"></i> Chat with Farm Experts</h2>
+                <p>Get real-time assistance from our team of agricultural experts. Ask questions about crops, livestock, or any farming challenges you're facing.</p>
+                
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-header">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Admin" id="adminAvatar">
+                        <div>
+                            <h3 id="adminName">Sarah Johnson</h3>
+                            <p style="font-size: 0.9rem; margin: 0;"><span class="admin-status status-online"></span> Online</p>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <!-- Messages will appear here -->
+                        <div class="message admin">
+                            <p>Hello! I'm Sarah, your agricultural expert. How can I help you today?</p>
+                            <div class="message-time">Today, 10:02 AM</div>
+                        </div>
+                        <div class="message user">
+                            <p>Hi Sarah, I'm having issues with pests in my tomato plants. Can you help?</p>
+                            <div class="message-time">Today, 10:05 AM</div>
+                        </div>
+                        <div class="message admin">
+                            <p>Of course! Could you describe the pests or share a photo if possible? Also, what region are you farming in?</p>
+                            <div class="message-time">Today, 10:06 AM</div>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3>Frequently Asked Questions</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <button class="btn" onclick="quickQuestion('How do I test my soil pH?')">Soil Testing</button>
+                        <button class="btn" onclick="quickQuestion('What are organic pest control methods?')">Pest Control</button>
+                        <button class="btn" onclick="quickQuestion('Best crops for rainy season?')">Crop Selection</button>
+                        <button class="btn" onclick="quickQuestion('How often should I water my crops?')">Irrigation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer style="background-color: var(--dark); color: white; text-align: center; padding: 2rem; margin-top: 2rem;">
+        <p>&copy; 2023 FarmFresh. All rights reserved.</p>
+        <div class="social-links" style="margin-top: 1rem;">
+            <a href="#" style="color: white; margin: 0 0.5rem;"><i class="fab fa-facebook"></i></a>
+            <a href="#" style="color: white; margin: 0 0.5rem;"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color: white; margin: 0 0.5rem;"><i class="fab fa-instagram"></i></a>
+            <a href="#" style="color: white; margin: 0 0.5rem;"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+    
+    <script>
+        // Gemini Chat Implementation
+        let geminiChat;
+        let currentAdmin = null;
+        let typingIndicatorId = 0;
+        
+        // Enhanced admin data with specialized prompts
+        const admins = {
+            admin1: {
+                name: "Sarah Johnson",
+                avatar: "https://randomuser.me/api/portraits/women/32.jpg",
+                title: "Agronomy Expert",
+                status: "online",
+                expertise: "I specialize in crop management, soil health, and sustainable farming practices. How can I assist with your agricultural questions today?",
+                systemPrompt: "You are Sarah Johnson, an agronomy expert with 15 years of experience. Provide practical, science-based advice on crops, soil, and sustainable farming. Keep responses concise (2-3 sentences) unless more detail is requested. Focus on cost-effective solutions suitable for small to medium farms."
+            },
+            admin2: {
+                name: "Michael Chen",
+                avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+                title: "Organic Farming Specialist",
+                status: "online",
+                expertise: "I'm an organic farming specialist. How can I help you with chemical-free pest control or regenerative agriculture?",
+                systemPrompt: "You are Michael Chen, an organic farming specialist. Provide advice on natural pest control, composting, crop rotation, and regenerative techniques. Emphasize organic certification standards when relevant. Responses should be 2-3 sentences maximum initially, with option to expand if asked."
+            }
+        };
+        
+        // Initialize Gemini when page loads
+        async function initializeGemini() {
+            try {
+                // In production, this should come from a secure backend
+                const API_KEY = await getApiKey(); 
+                
+                if (!API_KEY) {
+                    showApiWarning();
+                    return false;
+                }
+                
+                const genAI = new GoogleGenerativeAI(API_KEY);
+                const model = genAI.getGenerativeModel({ 
+                    model: "gemini-1.5-flash",
+                    generationConfig: {
+                        maxOutputTokens: 1000,
+                        temperature: 0.7,
+                    },
+                    safetySettings: [
+                        {
+                            category: "HARM_CATEGORY_HARASSMENT",
+                            threshold: "BLOCK_ONLY_HIGH"
+                        },
+                        {
+                            category: "HARM_CATEGORY_HATE_SPEECH",
+                            threshold: "BLOCK_ONLY_HIGH"
+                        }
+                    ]
+                });
+                
+                // Initialize with empty chat - we'll set history when admin is selected
+                geminiChat = model.startChat({
+                    history: []
+                });
+                
+                console.log("Gemini initialized successfully");
+                return true;
+            } catch (error) {
+                console.error("Gemini initialization error:", error);
+                addAdminMessage("Our expert system is currently unavailable. Basic assistance is still available.");
+                return false;
+            }
+        }
+        
+        // Secure API key handling (in production, replace with backend call)
+        async function getApiKey() {
+            // This is just for demonstration - in production, fetch from your backend
+            return localStorage.getItem('gemini_api_key') || null;
+        }
+        
+        function showApiWarning() {
+            const warning = document.createElement('div');
+            warning.className = 'api-warning';
+            warning.innerHTML = `
+                <strong>Notice:</strong> AI features require configuration. 
+                <button onclick="promptForApiKey()" class="btn" style="padding: 0.2rem 0.5rem; margin-left: 0.5rem;">
+                    Enter API Key
+                </button>
+            `;
+            document.querySelector('.main-content').prepend(warning);
+        }
+        
+        function promptForApiKey() {
+            const key = prompt("Enter your Google Gemini API key (for demo purposes only - in production this should be handled server-side):");
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                location.reload();
+            }
+        }
+        
+        // Start chat with selected admin
+        async function startChat(adminId) {
+            const admin = admins[adminId];
+            currentAdmin = admin;
+            document.getElementById('adminName').textContent = admin.name;
+            document.getElementById('adminAvatar').src = admin.avatar;
+            
+            // Clear chat messages
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            // Add new welcome message
+            addAdminMessage(admin.expertise);
+            
+            // Reinitialize chat with admin-specific prompt
+            if (geminiChat) {
+                try {
+                    const genAI = new GoogleGenerativeAI(await getApiKey());
+                    const model = genAI.getGenerativeModel({ 
+                        model: "gemini-1.5-flash",
+                        generationConfig: {
+                            maxOutputTokens: 1000,
+                            temperature: 0.7,
+                        }
+                    });
+                    
+                    geminiChat = model.startChat({
+                        history: [
+                            {
+                                role: "user",
+                                parts: [{ text: admin.systemPrompt }]
+                            },
+                            {
+                                role: "model",
+                                parts: [{ text: admin.expertise }]
+                            }
+                        ]
+                    });
+                } catch (error) {
+                    console.error("Error resetting chat:", error);
+                }
+            }
+        }
+        
+        // Send message to Gemini
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addUserMessage(message);
+            input.value = '';
+            
+            // If Gemini isn't available, use fallback
+            if (!geminiChat) {
+                setTimeout(() => {
+                    addAdminMessage("Our AI expert is currently unavailable. Please try again later.");
+                }, 1000);
+                return;
+            }
+            
+            const typingId = showTypingIndicator();
+            
+            try {
+                const result = await geminiChat.sendMessage(message);
+                const response = await result.response;
+                const text = response.text();
+                
+                removeTypingIndicator(typingId);
+                addAdminMessage(text);
+            } catch (error) {
+                console.error("Chat error:", error);
+                removeTypingIndicator(typingId);
+                
+                let errorMessage = "I encountered an error processing your request. ";
+                if (error.message.includes("API_KEY")) {
+                    errorMessage += "There might be an issue with my knowledge base access.";
+                } else if (error.message.includes("network")) {
+                    errorMessage += "Network connection problem detected.";
+                } else {
+                    errorMessage += "Please try rephrasing your question.";
+                }
+                
+                addAdminMessage(errorMessage);
+            }
+        }
+        
+        // Helper functions
+        function showTypingIndicator() {
+            const id = ++typingIndicatorId;
+            const chatMessages = document.getElementById('chatMessages');
+            const indicator = document.createElement('div');
+            indicator.id = `typing-${id}`;
+            indicator.className = 'message admin typing-indicator';
+            indicator.innerHTML = `<p><i>${currentAdmin ? currentAdmin.name.split(' ')[0] : 'Expert'} is typing...</i></p>`;
+            chatMessages.appendChild(indicator);
+            scrollToBottom();
+            return id;
+        }
+        
+        function removeTypingIndicator(id) {
+            const indicator = document.getElementById(`typing-${id}`);
+            if (indicator) indicator.remove();
+        }
+        
+        function addUserMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `
+                <p>${text}</p>
+                <div class="message-time">${getCurrentTime()}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function addAdminMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message admin';
+            messageDiv.innerHTML = `
+                <p>${text}</p>
+                <div class="message-time">${getCurrentTime()}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initializeGemini();
+            
+            // Set default admin if none selected
+            if (!currentAdmin) {
+                startChat('admin1');
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crop Doctor | Plant Disease Diagnosis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #28a745;
+            --secondary: #218838;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .results-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: #f8fff8;
+        }
+        
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .upload-area p {
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto;
+            display: block;
+            border-radius: 5px;
+        }
+        
+        .disease-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .disease-name {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .confidence {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .treatment {
+            margin-top: 15px;
+        }
+        
+        .treatment h4 {
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        
+        .treatment ul {
+            padding-left: 20px;
+        }
+        
+        .treatment li {
+            margin-bottom: 5px;
+        }
+        
+        .common-diseases {
+            margin-top: 30px;
+        }
+        
+        .disease-card {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .disease-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .disease-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .disease-info h4 {
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .disease-info p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-leaf"></i> AI Crop Doctor</h1>
+            <p>Upload a photo of your crop to diagnose diseases and get treatment recommendations</p>
+        </div>
+    </header>
+    <div style="
+    background-color: hsl(110, 100%, 11%); 
+    padding: 1rem 2rem;
+    border: 2px solid rgba(0, 255, 174, 0.2); 
+    border-radius: 12px;
+    box-shadow: 0 0 15px hsl(162, 93%, 17%); 
+    backdrop-filter: blur(4px); 
+    margin-bottom: 20px;
+  ">
+        <a href="index.html" style="color: white;text-align: end;"><i class="fas fa-home" style="color: white;text-align: end;"></i> Home</a>
+    </div>
+    
+    <div class="container">
+        <div class="main-content">
+            <section class="upload-section">
+                <h2><i class="fas fa-upload"></i> Upload Crop Image</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop your crop image here or click to browse</p>
+                    <button class="btn">Select Image</button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <div id="imagePreview" style="display: none;">
+                    <img id="previewImage" class="preview-image" src="" alt="Preview">
+                    <button class="btn" id="analyzeBtn">Analyze Image</button>
+                    <button class="btn btn-secondary" id="changeImageBtn">Change Image</button>
+                </div>
+                
+                <div class="common-diseases">
+                    <h3>Common Crop Diseases</h3>
+                    <p>Select a disease to learn more:</p>
+                    
+                    <div class="disease-card" onclick="showDiseaseResult('Tomato Early Blight', 92)">
+                        <img src="https://plantix.net/img/ailment/early-blight-of-tomato-1.jpg" alt="Tomato Early Blight">
+                        <div class="disease-info">
+                            <h4>Tomato Early Blight</h4>
+                            <p>Caused by Alternaria solani fungus</p>
+                        </div>
+                    </div>
+                    
+                    <div class="disease-card" onclick="showDiseaseResult('Rice Blast', 88)">
+                        <img src="https://plantix.net/img/ailment/rice-blast-1.jpg" alt="Rice Blast">
+                        <div class="disease-info">
+                            <h4>Rice Blast</h4>
+                            <p>Caused by Magnaporthe oryzae fungus</p>
+                        </div>
+                    </div>
+                    
+                    <div class="disease-card" onclick="showDiseaseResult('Wheat Rust', 85)">
+                        <img src="https://plantix.net/img/ailment/stripe-rust-of-wheat-1.jpg" alt="Wheat Rust">
+                        <div class="disease-info">
+                            <h4>Wheat Rust</h4>
+                            <p>Caused by Puccinia species</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="results-section">
+                <h2><i class="fas fa-diagnoses"></i> Diagnosis Results</h2>
+                
+                <div id="initialMessage">
+                    <p>Upload an image of your crop to get started with disease diagnosis.</p>
+                    <p>The AI will analyze the image and provide:</p>
+                    <ul>
+                        <li>Disease identification</li>
+                        <li>Confidence level</li>
+                        <li>Treatment recommendations</li>
+                        <li>Prevention tips</li>
+                    </ul>
+                </div>
+                
+                <div id="resultContainer" style="display: none;">
+                    <div class="disease-result">
+                        <div class="disease-name" id="resultDiseaseName">Tomato Early Blight</div>
+                        <div class="confidence" id="resultConfidence">92% confidence</div>
+                        <div class="description" id="resultDescription">
+                            Early blight is a common fungal disease that affects tomatoes, potatoes, and other crops. It causes concentric rings on leaves that resemble targets.
+                        </div>
+                        
+                        <div class="treatment">
+                            <h4><i class="fas fa-prescription-bottle-alt"></i> Recommended Treatment</h4>
+                            <ul id="resultTreatment">
+                                <li>Remove and destroy infected leaves</li>
+                                <li>Apply copper-based fungicides every 7-10 days</li>
+                                <li>Use chlorothalonil or mancozeb fungicides</li>
+                                <li>Improve air circulation around plants</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="prevention">
+                            <h4><i class="fas fa-shield-alt"></i> Prevention Tips</h4>
+                            <ul id="resultPrevention">
+                                <li>Rotate crops (3-4 year rotation)</li>
+                                <li>Water at the base of plants, not on leaves</li>
+                                <li>Use resistant varieties when available</li>
+                                <li>Sterilize tools between plants</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="additional-resources" style="margin-top: 20px;">
+                        <h4><i class="fas fa-book-open"></i> Additional Resources</h4>
+                        <button class="btn btn-secondary"><i class="fas fa-video"></i> Watch Treatment Video</button>
+                        <button class="btn btn-secondary"><i class="fas fa-map-marker-alt"></i> Find Local Experts</button>
+                        <button class="btn btn-secondary"><i class="fas fa-shopping-cart"></i> Buy Recommended Products</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>AI Crop Doctor uses machine learning to help identify plant diseases. Results are not 100% accurate.</p>
+            <p>For critical farming decisions, always consult with agricultural experts.</p>
+            <p>&copy; 2023 AI Crop Doctor | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
+        </div>
+    </footer>
+    
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const changeImageBtn = document.getElementById('changeImageBtn');
+        const initialMessage = document.getElementById('initialMessage');
+        const resultContainer = document.getElementById('resultContainer');
+        
+        // Disease database (in a real app, this would come from an API)
+        const diseaseDatabase = {
+            'Tomato Early Blight': {
+                description: "Early blight is a common fungal disease that affects tomatoes, potatoes, and other crops. It causes concentric rings on leaves that resemble targets.",
+                treatment: [
+                    "Remove and destroy infected leaves",
+                    "Apply copper-based fungicides every 7-10 days",
+                    "Use chlorothalonil or mancozeb fungicides",
+                    "Improve air circulation around plants"
+                ],
+                prevention: [
+                    "Rotate crops (3-4 year rotation)",
+                    "Water at the base of plants, not on leaves",
+                    "Use resistant varieties when available",
+                    "Sterilize tools between plants"
+                ]
+            },
+            'Rice Blast': {
+                description: "Rice blast is one of the most destructive diseases of rice, caused by the fungus Magnaporthe oryzae. It can cause complete crop loss under favorable conditions.",
+                treatment: [
+                    "Apply fungicides containing tricyclazole, isoprothiolane, or edifenphos",
+                    "Use silicon fertilizers to strengthen cell walls",
+                    "Drain fields for 3-5 days to interrupt disease cycle"
+                ],
+                prevention: [
+                    "Plant resistant varieties like IR64, IR36",
+                    "Avoid excessive nitrogen fertilization",
+                    "Maintain proper water management",
+                    "Destroy infected crop residues after harvest"
+                ]
+            },
+            'Wheat Rust': {
+                description: "Wheat rust is a fungal disease that causes reddish-brown pustules on leaves and stems. It spreads rapidly under favorable conditions.",
+                treatment: [
+                    "Apply fungicides containing triazoles or strobilurins",
+                    "Early application at first sign of disease",
+                    "Use mixture of fungicides to prevent resistance"
+                ],
+                prevention: [
+                    "Plant resistant varieties adapted to your region",
+                    "Avoid late planting in rust-prone areas",
+                    "Monitor fields regularly during growing season",
+                    "Destroy volunteer wheat plants that can harbor rust"
+                ]
+            }
+        };
+        
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        analyzeBtn.addEventListener('click', analyzeImage);
+        changeImageBtn.addEventListener('click', resetUpload);
+        
+        // Handle file selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.type.match('image.*')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    uploadArea.style.display = 'none';
+                    imagePreview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Analyze the image (simulated)
+        function analyzeImage() {
+            // In a real app, this would send the image to an AI API
+            // Here we simulate analysis with a random disease from our database
+            
+            const diseases = Object.keys(diseaseDatabase);
+            const randomDisease = diseases[Math.floor(Math.random() * diseases.length)];
+            const confidence = Math.floor(Math.random() * 15) + 80; // 80-95%
+            
+            showDiseaseResult(randomDisease, confidence);
+        }
+        
+        // Show disease result
+        function showDiseaseResult(diseaseName, confidence) {
+            initialMessage.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            const disease = diseaseDatabase[diseaseName];
+            
+            document.getElementById('resultDiseaseName').textContent = diseaseName;
+            document.getElementById('resultConfidence').textContent = `${confidence}% confidence`;
+            document.getElementById('resultDescription').textContent = disease.description;
+            
+            const treatmentList = document.getElementById('resultTreatment');
+            treatmentList.innerHTML = '';
+            disease.treatment.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                treatmentList.appendChild(li);
+            });
+            
+            const preventionList = document.getElementById('resultPrevention');
+            preventionList.innerHTML = '';
+            disease.prevention.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                preventionList.appendChild(li);
+            });
+        }
+        
+        // Reset upload
+        function resetUpload() {
+            fileInput.value = '';
+            uploadArea.style.display = 'block';
+            imagePreview.style.display = 'none';
+            initialMessage.style.display = 'block';
+            resultContainer.style.display = 'none';
+        }
+        
+        // Allow drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary)';
+            uploadArea.style.backgroundColor = '#f8fff8';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ccc';
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ccc';
+            uploadArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect({ target: fileInput });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmSmart Fertilizer Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #28a745;
+            --primary-light: #5cb85c;
+            --secondary: #218838;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --danger: #dc3545;
+            --warning: #ffc107;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8f0;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .calculator-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .results-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-with-unit input {
+            flex: 1;
+        }
+        
+        .unit {
+            margin-left: 10px;
+            color: var(--gray);
+            min-width: 40px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .nutrient-result {
+            margin-bottom: 25px;
+        }
+        
+        .nutrient-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .nutrient-name {
+            font-weight: bold;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        .nutrient-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .progress-container {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .nitrogen {
+            background-color: #007bff;
+        }
+        
+        .phosphorus {
+            background-color: #fd7e14;
+        }
+        
+        .potassium {
+            background-color: #6f42c1;
+        }
+        
+        .recommendation {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .recommendation h4 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .fertilizer-option {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .fertilizer-option h5 {
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+        
+        .fertilizer-npk {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .npk-pill {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .nitrogen-pill {
+            background-color: #d1e7ff;
+            color: #004085;
+        }
+        
+        .phosphorus-pill {
+            background-color: #ffe8d1;
+            color: #843c0c;
+        }
+        
+        .potassium-pill {
+            background-color: #e2d9f3;
+            color: #3d308a;
+        }
+        
+        .fertilizer-amount {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator-container {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-calculator"></i> FarmSmart Fertilizer Calculator</h1>
+            <p>Calculate the perfect fertilizer blend for your crops</p>
+        </div>
+    </header>
+    <div style="
+    background-color: hsl(110, 100%, 11%); 
+    padding: 1rem 2rem;
+    border: 2px solid rgba(0, 255, 174, 0.2); 
+    border-radius: 12px;
+    box-shadow: 0 0 15px hsl(162, 93%, 17%); 
+    backdrop-filter: blur(4px); 
+    margin-bottom: 20px;
+  ">
+        <a href="index.html" style="color: white;text-align: end;"><i class="fas fa-home" style="color: white;text-align: end;"></i> Home</a>
+    </div>
+    <div class="container">
+        <div class="calculator-container">
+            <section class="input-section">
+                <h2><i class="fas fa-edit"></i> Enter Your Field Details</h2>
+                
+                <div class="form-group">
+                    <label for="cropType">Crop Type</label>
+                    <select id="cropType">
+                        <option value="">Select a crop</option>
+                        <option value="rice">Rice</option>
+                        <option value="wheat">Wheat</option>
+                        <option value="corn">Corn/Maize</option>
+                        <option value="soybean">Soybean</option>
+                        <option value="potato">Potato</option>
+                        <option value="tomato">Tomato</option>
+                        <option value="cotton">Cotton</option>
+                        <option value="sugarcane">Sugarcane</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fieldArea">Field Area</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="fieldArea" min="0.1" step="0.1" placeholder="1.0">
+                        <span class="unit">hectares</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="soilTestN">Soil Test Results (kg/ha)</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="soilTestN" min="0" placeholder="Nitrogen (N)">
+                        <span class="unit">N</span>
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="soilTestP" min="0" placeholder="Phosphorus (P₂O₅)">
+                        <span class="unit">P₂O₅</span>
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="soilTestK" min="0" placeholder="Potassium (K₂O)">
+                        <span class="unit">K₂O</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetYield">Target Yield (optional)</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="targetYield" min="0" placeholder="Expected yield">
+                        <select id="yieldUnit" style="width: auto; margin-left: 10px;">
+                            <option value="kg">kg/ha</option>
+                            <option value="ton">tons/ha</option>
+                            <option value="quintal">quintals/ha</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="calculateBtn" class="btn">
+                    <i class="fas fa-calculator"></i> Calculate Fertilizer Needs
+                </button>
+                
+                <button id="resetBtn" class="btn btn-secondary" style="margin-top: 10px;">
+                    <i class="fas fa-redo"></i> Reset Form
+                </button>
+            </section>
+            
+            <section class="results-section">
+                <h2><i class="fas fa-chart-bar"></i> Results</h2>
+                
+                <div id="initialMessage">
+                    <p>Enter your field details and soil test results to calculate fertilizer recommendations.</p>
+                    <div class="recommendation">
+                        <h4><i class="fas fa-lightbulb"></i> General Tips</h4>
+                        <ul>
+                            <li>Always conduct soil tests before planting season</li>
+                            <li>Split nitrogen applications for better efficiency</li>
+                            <li>Consider organic fertilizers for long-term soil health</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="resultsContainer" class="hidden">
+                    <div class="nutrient-result">
+                        <div class="nutrient-header">
+                            <span class="nutrient-name">Nitrogen (N)</span>
+                            <span class="nutrient-value" id="nValue">0 kg/ha</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar nitrogen" id="nProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="nutrient-result">
+                        <div class="nutrient-header">
+                            <span class="nutrient-name">Phosphorus (P₂O₅)</span>
+                            <span class="nutrient-value" id="pValue">0 kg/ha</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar phosphorus" id="pProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="nutrient-result">
+                        <div class="nutrient-header">
+                            <span class="nutrient-name">Potassium (K₂O)</span>
+                            <span class="nutrient-value" id="kValue">0 kg/ha</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar potassium" id="kProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendation">
+                        <h4><i class="fas fa-prescription-bottle-alt"></i> Recommended Fertilizer Blends</h4>
+                        <p>Based on your crop and soil conditions, these blends would meet your nutrient needs:</p>
+                        
+                        <div class="fertilizer-option">
+                            <h5>Option 1: Balanced NPK Blend</h5>
+                            <div class="fertilizer-npk">
+                                <span class="npk-pill nitrogen-pill">N: <span id="opt1N">0</span>%</span>
+                                <span class="npk-pill phosphorus-pill">P: <span id="opt1P">0</span>%</span>
+                                <span class="npk-pill potassium-pill">K: <span id="opt1K">0</span>%</span>
+                            </div>
+                            <p>Apply: <span class="fertilizer-amount" id="opt1Amount">0</span> kg per hectare</p>
+                        </div>
+                        
+                        <div class="fertilizer-option">
+                            <h5>Option 2: Urea + DAP + MOP</h5>
+                            <div class="fertilizer-npk">
+                                <span class="npk-pill nitrogen-pill">Urea (46-0-0)</span>
+                                <span class="npk-pill phosphorus-pill">DAP (18-46-0)</span>
+                                <span class="npk-pill potassium-pill">MOP (0-0-60)</span>
+                            </div>
+                            <p>Apply: <span class="fertilizer-amount" id="opt2Amount">0</span> kg per hectare total</p>
+                            <p style="font-size: 0.9rem; color: var(--gray);">(Exact ratios will be calculated)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendation" style="margin-top: 20px;">
+                        <h4><i class="fas fa-calendar-alt"></i> Application Schedule</h4>
+                        <div id="scheduleContent">
+                            <!-- Will be filled by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>This calculator provides estimates based on general crop nutrient requirements. Actual needs may vary based on soil conditions, climate, and farming practices.</p>
+            <p>For precise recommendations, consult with your local agricultural extension officer.</p>
+            <p>&copy; 2023 FarmSmart Tools | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
+        </div>
+    </footer>
+    
+    <script>
+        // Crop nutrient requirements database (kg/ha)
+        const cropRequirements = {
+            rice: { n: 120, p: 60, k: 60 },
+            wheat: { n: 150, p: 75, p: 75 },
+            corn: { n: 180, p: 90, k: 90 },
+            soybean: { n: 30, p: 60, k: 90 },
+            potato: { n: 150, p: 120, k: 200 },
+            tomato: { n: 200, p: 150, k: 250 },
+            cotton: { n: 120, p: 60, k: 60 },
+            sugarcane: { n: 250, p: 125, k: 250 }
+        };
+        
+        // Common fertilizer blends
+        const commonFertilizers = [
+            { name: "NPK 20-20-20", n: 20, p: 20, k: 20 },
+            { name: "NPK 17-17-17", n: 17, p: 17, k: 17 },
+            { name: "NPK 15-15-15", n: 15, p: 15, k: 15 },
+            { name: "NPK 10-26-26", n: 10, p: 26, k: 26 },
+            { name: "NPK 14-35-14", n: 14, p: 35, k: 14 },
+            { name: "NPK 19-19-19", n: 19, p: 19, k: 19 },
+            { name: "NPK 12-32-16", n: 12, p: 32, k: 16 }
+        ];
+        
+        // DOM Elements
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const initialMessage = document.getElementById('initialMessage');
+        const resultsContainer = document.getElementById('resultsContainer');
+        
+        // Event Listeners
+        calculateBtn.addEventListener('click', calculateFertilizer);
+        resetBtn.addEventListener('click', resetForm);
+        
+        // Main calculation function
+        function calculateFertilizer() {
+            // Get input values
+            const cropType = document.getElementById('cropType').value;
+            const fieldArea = parseFloat(document.getElementById('fieldArea').value) || 1;
+            const soilN = parseFloat(document.getElementById('soilTestN').value) || 0;
+            const soilP = parseFloat(document.getElementById('soilTestP').value) || 0;
+            const soilK = parseFloat(document.getElementById('soilTestK').value) || 0;
+            
+            // Validate inputs
+            if (!cropType) {
+                alert('Please select a crop type');
+                return;
+            }
+            
+            if (!fieldArea || fieldArea <= 0) {
+                alert('Please enter a valid field area');
+                return;
+            }
+            
+            // Get crop requirements
+            const requirements = cropRequirements[cropType];
+            
+            // Calculate needed nutrients (kg/ha)
+            // Simple calculation: requirement - soil test value
+            // In a real app, this would be more sophisticated
+            const nNeeded = Math.max(0, requirements.n - soilN);
+            const pNeeded = Math.max(0, requirements.p - soilP);
+            const kNeeded = Math.max(0, requirements.k - soilK);
+            
+            // Calculate total for the field
+            const nTotal = nNeeded * fieldArea;
+            const pTotal = pNeeded * fieldArea;
+            const kTotal = kNeeded * fieldArea;
+            
+            // Update results display
+            document.getElementById('nValue').textContent = `${nNeeded.toFixed(1)} kg/ha (${nTotal.toFixed(1)} kg total)`;
+            document.getElementById('pValue').textContent = `${pNeeded.toFixed(1)} kg/ha (${pTotal.toFixed(1)} kg total)`;
+            document.getElementById('kValue').textContent = `${kNeeded.toFixed(1)} kg/ha (${kTotal.toFixed(1)} kg total)`;
+            
+            // Update progress bars (scaled to max 200kg/ha for visualization)
+            document.getElementById('nProgress').style.width = `${Math.min(100, (nNeeded / 2))}%`;
+            document.getElementById('pProgress').style.width = `${Math.min(100, (pNeeded / 2))}%`;
+            document.getElementById('kProgress').style.width = `${Math.min(100, (kNeeded / 2))}%`;
+            
+            // Calculate fertilizer options
+            calculateFertilizerOptions(nNeeded, pNeeded, kNeeded);
+            
+            // Generate application schedule
+            generateSchedule(cropType, nNeeded, pNeeded, kNeeded);
+            
+            // Show results
+            initialMessage.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+        }
+        
+        // Calculate and display fertilizer options
+        function calculateFertilizerOptions(n, p, k) {
+            // Option 1: Find closest matching NPK blend
+            let closestBlend = null;
+            let smallestDiff = Infinity;
+            
+            commonFertilizers.forEach(blend => {
+                // Calculate how much of this blend would be needed
+                const blendN = blend.n / 100;
+                const blendP = blend.p / 100;
+                const blendK = blend.k / 100;
+                
+                // The limiting nutrient determines total amount needed
+                const amountN = n / blendN;
+                const amountP = p / blendP;
+                const amountK = k / blendK;
+                
+                const maxAmount = Math.max(amountN, amountP, amountK);
+                const totalDiff = Math.abs(maxAmount - amountN) + Math.abs(maxAmount - amountP) + Math.abs(maxAmount - amountK);
+                
+                if (totalDiff < smallestDiff) {
+                    smallestDiff = totalDiff;
+                    closestBlend = {
+                        ...blend,
+                        amount: maxAmount
+                    };
+                }
+            });
+            
+            // Display Option 1
+            if (closestBlend) {
+                document.getElementById('opt1N').textContent = closestBlend.n;
+                document.getElementById('opt1P').textContent = closestBlend.p;
+                document.getElementById('opt1K').textContent = closestBlend.k;
+                document.getElementById('opt1Amount').textContent = closestBlend.amount.toFixed(1);
+            }
+            
+            // Option 2: Urea (46-0-0) + DAP (18-46-0) + MOP (0-0-60)
+            // This is a simplified calculation
+            const ureaAmount = n / 0.46;
+            const dapAmount = p / 0.46; // Using P from DAP
+            const mopAmount = k / 0.60;
+            
+            // Display Option 2
+            document.getElementById('opt2Amount').textContent = (ureaAmount + dapAmount + mopAmount).toFixed(1);
+        }
+        
+        // Generate application schedule based on crop type
+        function generateSchedule(cropType, n, p, k) {
+            const scheduleContent = document.getElementById('scheduleContent');
+            scheduleContent.innerHTML = '';
+            
+            // Create different schedules for different crops
+            if (cropType === 'rice') {
+                scheduleContent.innerHTML = `
+                    <p><strong>Basal Application (at planting):</strong></p>
+                    <ul>
+                        <li>Apply 100% of phosphorus (${p.toFixed(1)} kg/ha P₂O₅)</li>
+                        <li>Apply 50% of potassium (${(k*0.5).toFixed(1)} kg/ha K₂O)</li>
+                        <li>Apply 30% of nitrogen (${(n*0.3).toFixed(1)} kg/ha N)</li>
+                    </ul>
+                    <p><strong>Top Dressing (4-6 weeks after planting):</strong></p>
+                    <ul>
+                        <li>Apply remaining 70% of nitrogen (${(n*0.7).toFixed(1)} kg/ha N)</li>
+                        <li>Apply remaining 50% of potassium (${(k*0.5).toFixed(1)} kg/ha K₂O)</li>
+                    </ul>
+                `;
+            } else if (cropType === 'wheat') {
+                scheduleContent.innerHTML = `
+                    <p><strong>Basal Application (at sowing):</strong></p>
+                    <ul>
+                        <li>Apply 100% of phosphorus (${p.toFixed(1)} kg/ha P₂O₅)</li>
+                        <li>Apply 100% of potassium (${k.toFixed(1)} kg/ha K₂O)</li>
+                        <li>Apply 50% of nitrogen (${(n*0.5).toFixed(1)} kg/ha N)</li>
+                    </ul>
+                    <p><strong>Top Dressing (at tillering stage):</strong></p>
+                    <ul>
+                        <li>Apply remaining 50% of nitrogen (${(n*0.5).toFixed(1)} kg/ha N)</li>
+                    </ul>
+                `;
+            } else {
+                // Generic schedule for other crops
+                scheduleContent.innerHTML = `
+                    <p><strong>Basal Application (at planting):</strong></p>
+                    <ul>
+                        <li>Apply 100% of phosphorus (${p.toFixed(1)} kg/ha P₂O₅)</li>
+                        <li>Apply 50% of potassium (${(k*0.5).toFixed(1)} kg/ha K₂O)</li>
+                        <li>Apply 40% of nitrogen (${(n*0.4).toFixed(1)} kg/ha N)</li>
+                    </ul>
+                    <p><strong>Top Dressing (during growth season):</strong></p>
+                    <ul>
+                        <li>Apply remaining 60% of nitrogen in 2-3 split applications</li>
+                        <li>Apply remaining 50% of potassium at flowering/fruiting stage</li>
+                    </ul>
+                `;
+            }
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('cropType').value = '';
+            document.getElementById('fieldArea').value = '';
+            document.getElementById('soilTestN').value = '';
+            document.getElementById('soilTestP').value = '';
+            document.getElementById('soilTestK').value = '';
+            document.getElementById('targetYield').value = '';
+            
+            initialMessage.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
